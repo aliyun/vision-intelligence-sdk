@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">viapi-demo</string>
+
+    <!--通用文案-->
+    <string name="common_complete">完成</string>
+    <string name="common_none">无</string>
+    <string name="common_cancel">取消</string>
+    <string name="common_i_know">我知道了</string>
+    <string name="common_delete">删除</string>
+
+    <!--homepage-->
+    <string name="developing">正在开发中，敬请期待</string>
+    <string name="refused">权限被拒绝</string>
+    <string name="base_fps">Resolution:\n\t%dX%d\nFPS: %d\nRender time:\n\t%dms\n\AlgorithmTime:\n\t%dms\n\GetLoadTextureTime:\n\t%dms</string>
+    <!--背景弹框描述文字-->
+    <string name="bg_desc">设置虚拟背景</string>
+    <!--背景弹框完成按钮文字描述-->
+    <string name="desc_button">完成</string>
+    <!--图片最大宽高提示-->
+    <string name="image_hint">添加失败，图片最大尺寸支持4096*4096像素</string>
+    <!--图片最小宽高提示-->
+    <string name="min_image_hint">图片分辨率过小，可能导致背景模糊</string>
+    <!--支持最大自定义图片添加张数-->
+    <string name="bg_customImage_max_number">最多支持8个自定义背景，可删除旧的内容后再添加。</string>
+
+
+    <string name="home_page_tab_video_segment">视频分割</string>
+    <string name="home_page_tab_picture_segment">图像分割</string>
+    <string name="home_page_tab_facebeauty">美颜</string>
+    <string name="home_page_tab_face_landmask">人脸关键点</string>
+    <string name="home_page_tab_human_body_landmask">人体关键点</string>
+    <string name="home_page_tab_face_stickers">贴纸</string>
+    <string name="virtual_setting_txt">设置虚拟背景</string>
+    <string name="vb_card_add_pic_format_no_support_toast">所选的图片格式不支持</string>
+    <string name="vb_load_failed">加载失败</string>
+    <string name="vb_imgpix_outof_max">添加失败，图片最大尺寸支持4096*4096像素</string>
+    <string name="vb_rechoice">重新选择</string>
+    <string name="vb_support_localresource_max_count">最多支持12个自定义背景，可删除旧的内容后再添加</string>
+    <string name="vb_imgpix_lessthan_min" sync="dt_conf_virtual_imgpix_lessthan_min">图片分辨率过小，低于750*750像素可能导致图片模糊</string>
+    <string name="vb_delete_question">确定删除当前图片吗？</string>
+    <string name="vb_delete">确定删除</string>
+    <string name="vb_card_delete_dialog_fail" sync="vb_card_delete_dialog_fail">删除失败</string>
+
+
+</resources>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_centerInParent="true"
+    android:layout_width="76dp"
+    android:layout_height="76dp">
+
+    <RelativeLayout
+        android:id="@+id/normal_card_container"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@drawable/bg_vb_item_card_selector"
+        android:layout_centerInParent="true"
+        android:clickable="true"
+        android:focusable="true">
+
+        <com.aliyun.ai.viapi.ui.widget.RoundImageView
+            android:id="@+id/bg_icon"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_centerInParent="true"
+            android:scaleType="centerCrop"
+            app:borderRadius="8dp"
+            app:type="round" />
+
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/delete_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:padding="3dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/ic_close"
+        android:background="@drawable/bg_vb_remove_oval"
+        android:gravity="center"
+        android:visibility="visible"
+        android:enabled="true"
+        android:clickable="true"
+        tools:visibility="visible"
+        app:tint="@color/white" />
+
+</RelativeLayout>

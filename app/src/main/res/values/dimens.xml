@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="item_height">60dp</dimen>
+    <dimen name="item_margin">10dp</dimen>
+    <!--大标题 -->
+    <dimen name="big_title">18sp</dimen>
+    <dimen name="text_20">20sp</dimen>
+    <!-- 正文标题-->
+    <dimen name="main_title">16sp</dimen>
+    <!-- 正文-->
+    <dimen name="main_text">14sp</dimen>
+    <dimen name="small_text">12sp</dimen>
+    <dimen name="middle_text">13sp</dimen>
+    <dimen name="home_rb_text">10sp</dimen>
+    <dimen name="margin">10dp</dimen>
+    <!--背景弹框描述文字字体大小-->
+    <dimen name="desc_text">17sp</dimen>
+    <!--背景弹框描述文字高度-->
+    <dimen name="desc_height">20dp</dimen>
+    <!--背景弹框完成按钮radius-->
+    <dimen name="desc_button_radius">6dp</dimen>
+    <!--背景弹框完成按钮字体大小-->
+    <dimen name="desc_button_font">14dp</dimen>
+    <!--背景弹框完成按钮宽、高-->
+    <dimen name="desc_button_width">59dp</dimen>
+    <dimen name="desc_button_height">34dp</dimen>
+    <!--背景弹框内组件边距-->
+    <dimen name="desc_margin">16dp</dimen>
+    <!--背景弹框内每个icon选项宽、高-->
+    <dimen name="icon_width">64dp</dimen>
+    <dimen name="icon_height">64dp</dimen>
+    <!--背景弹框内每个icon选项选中框的宽度-->
+    <dimen name="icon_select_width">5px</dimen>
+    <dimen name="icon_select_width1">172dp</dimen>
+    <dimen name="title_height">40dp</dimen>
+</resources>

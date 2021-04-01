@@ -1,0 +1,113 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-android-extensions'
+}
+
+def getBuildTime = { ->
+    try {
+        Date date = new Date()
+        String dateStr = date.format("yyyyMMddHHmm")
+        return dateStr
+    }
+    catch (ignored) {
+        ignored.printStackTrace()
+        return ""
+    }
+}
+
+android {
+    compileSdkVersion COMPILE_SDK_VERSION as int
+
+    defaultConfig {
+        applicationId "com.aliyun.ai.viapi"
+        minSdkVersion MIN_SDK_VERSION as int
+        targetSdkVersion TARGET_SDK_VERSION as int
+        versionCode = VERSION_CODE as int
+        versionName = VERSION_NAME
+
+        externalNativeBuild {
+            cmake {
+                cppFlags '-Wno-c++11-narrowing -frtti -fexceptions'
+                abiFilters 'armeabi-v7a'
+            }
+        }
+        ndk {
+            abiFilters 'armeabi-v7a'
+        }
+    }
+
+    buildTypes {
+        release {
+            debuggable false
+            zipAlignEnabled true
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+        checkReleaseBuilds true
+    }
+
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+
+    renameApk(getBuildTime)
+}
+
+def renameApk(getBuildTime) {
+    android.applicationVariants.all { variant ->
+        variant.outputs.all {
+            def apkFileName = rootProject.name.toLowerCase() +
+//                    "_" + getVersionName().replace(".", "_") +
+                    "_" + getBuildTime() +
+                    "_${variant.buildType.name}" +
+                    ".apk"
+            outputFileName = apkFileName
+            variant.assemble.doLast {
+
+                if (variant.mappingFile != null && variant.mappingFile.exists()) {
+                    copy {
+                        from variant.mappingFile
+                        into variant.getPackageApplication().outputDirectory
+                        rename {
+                            String fileName -> apkFileName + "_mapping.txt"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    implementation "androidx.appcompat:appcompat:$ANDROIDX_VERSION"
+    implementation "com.google.android.material:material:$google_material_ver"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "com.parse.bolts:bolts-tasks:$bolts_tasks_version"
+    implementation "androidx.constraintlayout:constraintlayout:$constraint_version"
+    implementation "com.github.bumptech.glide:glide:$glide_version"
+    implementation "com.android.support:recyclerview-v7:$recyclerview_version"
+    implementation "com.github.tbruyelle:rxpermissions:$rxpermissions_version"
+    implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
+    implementation "com.bigkoo:ConvenientBanner:$convenientbanner_version"
+    implementation "androidx.vectordrawable:vectordrawable:$vectordrawable_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$LIFECYLE_VERSION"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$LIFECYLE_VERSION"
+    implementation "androidx.lifecycle:lifecycle-extensions:$LIFECYLE_VERSION"
+}

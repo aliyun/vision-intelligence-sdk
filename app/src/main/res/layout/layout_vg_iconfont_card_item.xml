@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="75dp"
+    android:layout_height="75dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <RelativeLayout
+        android:id="@+id/iconfont_card_container"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/bg_vb_iconfont_item_card_selector"
+        android:clickable="true"
+        android:focusable="true">
+
+        <View
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_centerInParent="true"
+            android:background="@drawable/bg_vb_iconfont_item_card" />
+
+
+        <ImageView
+            android:id="@+id/vg_card_center_iconfont"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_centerInParent="true"
+            android:background="#00000000"
+            android:src="@drawable/ic_add"
+            android:textColor="#FFFFFFFF"
+            android:textSize="16dp"
+            app:tint="@color/white" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

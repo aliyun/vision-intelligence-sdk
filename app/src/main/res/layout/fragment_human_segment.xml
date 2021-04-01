@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.aliyun.ai.viapi.ui.widget.GLImageView
+        android:id="@+id/gl_surface"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/icon_back"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="15dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="@null"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_arrow"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="#EAA54B" />
+
+    <ImageView
+        android:id="@+id/icon_show_debug"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="@null"
+        android:padding="5dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_debug"
+        app:layout_constraintRight_toLeftOf="@id/icon_switch_camera"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="#EAA54B" />
+
+    <ImageView
+        android:id="@+id/icon_switch_camera"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="@null"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_switch_camera"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="#EAA54B" />
+
+    <ImageView
+        android:id="@+id/take_blend_picture"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_menu_camera"
+        android:text="Camera"
+        app:layout_constraintLeft_toLeftOf="@+id/icon_switch_camera"
+        app:layout_constraintRight_toRightOf="@+id/icon_switch_camera"
+        app:layout_constraintTop_toBottomOf="@+id/icon_switch_camera" />
+
+    <ImageView
+        android:id="@+id/take_seg_in_pic"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_menu_camera"
+        android:text="Camera"
+        app:layout_constraintLeft_toLeftOf="@+id/icon_switch_camera"
+        app:layout_constraintRight_toRightOf="@+id/icon_switch_camera"
+        app:layout_constraintTop_toBottomOf="@+id/take_blend_picture"
+        app:tint="#00ff00" />
+
+    <ImageView
+        android:id="@+id/take_seg_out_pic"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_menu_camera"
+        android:text="Camera"
+        app:layout_constraintLeft_toLeftOf="@+id/icon_switch_camera"
+        app:layout_constraintRight_toRightOf="@+id/icon_switch_camera"
+        app:layout_constraintTop_toBottomOf="@+id/take_seg_in_pic"
+        app:tint="#ff0000" />
+
+    <ImageView
+        android:id="@+id/icon_select_vb"
+        android:layout_width="34dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_blend_bg"
+        android:textSize="24sp"
+        app:layout_constraintLeft_toLeftOf="@+id/icon_switch_camera"
+        app:layout_constraintRight_toRightOf="@+id/icon_switch_camera"
+        app:layout_constraintTop_toBottomOf="@+id/take_seg_out_pic"
+        app:tint="#EAA54B" />
+
+    <TextView
+        android:id="@+id/fu_base_fps_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/bg_fps_text_background"
+        android:padding="@dimen/margin"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/main_title"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.aliyun.ai.viapi.ui.widget.VBPicturePickView
+        android:id="@+id/background_list_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <include
+        android:id="@+id/loading"
+        layout="@layout/layout_loading"
+        android:visibility="gone" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
