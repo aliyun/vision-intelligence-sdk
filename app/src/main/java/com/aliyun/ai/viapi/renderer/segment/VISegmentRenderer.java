@@ -87,7 +87,7 @@ public class VISegmentRenderer {
         }
         final Integer[] status = new Integer[1];
         String modelsPath = AssetsProvider.getSegmentModelsFilePath(mContext);
-        String licensePath = VIAPICreateApi.getInstance().getVIAPISdkCore().getLicensePath();
+        String licensePath = VIAPICreateApi.getInstance().getVIAPISdkCore().getLicenseFilePath();
         synchronized (mInitLock) {
             status[0] = mHumanSegment.nativeCheckLicense(licensePath);
             if (status[0] != 0) {

@@ -34,7 +34,6 @@ public class VIAPISdkApp extends Application {
 
     private void initSDK() {
         int status = VIAPICreateApi.getInstance().getVIAPISdkCore().init(this, BuildConfig.DEBUG);
-        Logs.i(TAG, "init = " + status + ", license path = " + VIAPICreateApi.getInstance().getVIAPISdkCore().getLicensePath());
         if (status != 0) {
             Toast.makeText(this, VIAPIStatusCode.getErrorMsg(status), Toast.LENGTH_LONG).show();
         } else {
@@ -42,10 +41,7 @@ public class VIAPISdkApp extends Application {
             status = VIAPICreateApi.getInstance().getVIAPISdkCore().initLicense();
             Logs.i(TAG, "initLicense = " + status);
             if (status == 0) {
-                String sdkExpireTime = VIAPICreateApi.getInstance().getVIAPISdkCore().getLicenseExpireTime();
-                if (!TextUtils.isEmpty(sdkExpireTime)) {
-                    Logs.i(TAG, "到期日 = " + sdkExpireTime + ", 距离到期天数 = " + licenseExpireDays(sdkExpireTime));
-                }
+                updateLicense();
             }
         }
     }
@@ -62,5 +58,24 @@ public class VIAPISdkApp extends Application {
             e.printStackTrace();
         }
         return days;
+    }
+
+    private void updateLicense() {
+        String sdkExpireTime = VIAPICreateApi.getInstance().getVIAPISdkCore().getLicenseExpireTime();
+        if (!TextUtils.isEmpty(sdkExpireTime)) {
+            int expireDays = licenseExpireDays(sdkExpireTime);
+            Logs.i(TAG, "到期日 = " + sdkExpireTime + ", 距离到期天数 = " + expireDays);
+            if (expireDays < 30) {
+                String licensePath = VIAPICreateApi.getInstance().getVIAPISdkCore().getLicensePath();
+                String licenseFilePath = VIAPICreateApi.getInstance().getVIAPISdkCore().getLicenseFilePath();
+                Logs.i(TAG, "licensePath = " + licensePath);
+                Logs.i(TAG, "licenseFilePath = " + licenseFilePath);
+                replaceLicense(licensePath, "新的license目录");
+            }
+        }
+    }
+
+    private void replaceLicense(String dstLicensePath, String newLicenseFile) {
+        // TODO 用新的license替换旧的license文件
     }
 }

@@ -14,7 +14,7 @@ viapi-android-sdk-demo 是阿里达摩院推出的一款适用于 Android 平台
 + 系统：最低支持 Android 4.0（API Level 14），需要开发者通过minSdkVersion来保证支持系统的检测。
 
 ## 3.2 开发包资源说明
-+ ovp-sdk-1.0.1.3.aar --viapi的sdk的aar包
++ ovp-sdk-1.0.1.5.aar --viapi的sdk的aar包
 + damo-viapi.license  --license文件
 + seg_human_0.0.1.nn  --人像分割模型文件
 
@@ -22,13 +22,13 @@ viapi-android-sdk-demo 是阿里达摩院推出的一款适用于 Android 平台
 ## 4.1 将算法能力相关的文件包导入到工程
 把sdk的aar拷贝到主工程libs目录下，把模型文件xxx.nn文件和.license文件拷贝到工程app module的assets目录下如下图：
 
-![](./docs/images/4.1_img.png)
+![image](https://github.com/aliyun/vision-intelligence-sdk/blob/master/docs/images/4.1_img.png)
 
 **注意：不要修改license文件名称及存放的路径。**
 ## 4.2 工程gradle配置
 在主工程的build.gradle文件相关配置设置，主工程的build.gradle文件在Project目录中位置如下图：
 
-![](./docs/images/4.2_img.png)
+![image](https://github.com/aliyun/vision-intelligence-sdk/blob/master/docs/images/4.2_img.png)
 
 ```
 android {
@@ -283,11 +283,11 @@ int类型，返回0为销毁算法相关成功，其它返回为销毁算法相�
 # 7 Demo说明
 + 项目实时视频图像分割渲染及背景叠加是通过openGL相关操作渲染的，详见demo。
 + 运行demo时，需将正式的license替换到assets目录，且applicationID(包名)和license对应。
-+ sdk的license包含了多个算法能力。如用户申请的license不包含其中的某算法能力，调用此算法API对应的接口时，没有效果，错误提示详见错误码。
++ sdk的license包含了多个算法能力，如用户申请的license不包含其中的某算法能力，调用对应的算法API对应的接口时返回错误，错误说明详见<6.1 错误码含义>。
 
 # 8 license过期时间获取
 #### 接口描述：
-获取当前SDK中license的过期时间
+获取当前SDK中license的过期时间，业务层通过此时间，可以实现用续费后的license替换掉此过期的license文件以达到续费SDK效果
 #### 接口示例：
 ```
   String sdkExpireTime = VIAPICreateApi.getInstance().getVIAPISdkCore().getLicenseExpireTime();
@@ -313,6 +313,25 @@ license过期时间
             e.printStackTrace();
         }
         return days;
+    }
+
+    private void updateLicense() {
+        String sdkExpireTime = VIAPICreateApi.getInstance().getVIAPISdkCore().getLicenseExpireTime();
+        if (!TextUtils.isEmpty(sdkExpireTime)) {
+            int expireDays = licenseExpireDays(sdkExpireTime);
+            Logs.i(TAG, "到期日 = " + sdkExpireTime + ", 距离到期天数 = " + expireDays);
+            if (expireDays < 30) {
+                String licensePath = VIAPICreateApi.getInstance().getVIAPISdkCore().getLicensePath();
+                String licenseFilePath = VIAPICreateApi.getInstance().getVIAPISdkCore().getLicenseFilePath();
+                Logs.i(TAG, "licensePath = " + licensePath);
+                Logs.i(TAG, "licenseFilePath = " + licenseFilePath);
+                replaceLicense(licensePath, "新的license目录");
+            }
+        }
+    }
+
+    private void replaceLicense(String dstLicensePath, String newLicenseFile) {
+        // 用新的license替换旧的license文件
     }
 ```
 
