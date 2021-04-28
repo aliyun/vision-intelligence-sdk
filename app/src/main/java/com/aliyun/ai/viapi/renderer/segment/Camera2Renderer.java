@@ -46,7 +46,7 @@ public class Camera2Renderer extends BaseRenderer implements Camera2Helper.OnCam
         this.mGlSurfaceView = glSurfaceView;
         this.mIRendererListener = onRendererStatusListener;
         this.mCameraHelper = new Camera2Helper();
-        this.mCameraHelper.initCamera(mActivity);
+        this.mCameraHelper.initCamera(mActivity, mTaskHandler);
         this.mCameraHelper.setCameraPreviewFrameListener(this);
     }
 

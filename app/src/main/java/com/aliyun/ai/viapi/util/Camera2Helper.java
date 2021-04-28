@@ -105,8 +105,7 @@ public final class Camera2Helper implements ImageReader.OnImageAvailableListener
     private byte[] mYDataBuffer;
     private byte[] mCameraNv21Byte;
     private int mYuvDataBufferPosition;
-    private Handler mainHandler = new Handler(Looper.getMainLooper());
-
+    private Handler mTaskHandler;
     private CameraCaptureSession.CaptureCallback mCaptureCallback = new CameraCaptureSession.CaptureCallback() {
 
         @Override
@@ -119,7 +118,8 @@ public final class Camera2Helper implements ImageReader.OnImageAvailableListener
         }
     };
 
-    public void initCamera(Activity activity) {
+    public void initCamera(Activity activity, Handler mTaskHandler) {
+        this.mTaskHandler = mTaskHandler;
         mCameraManager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
         try {
             String[] ids = mCameraManager.getCameraIdList();
@@ -183,7 +183,7 @@ public final class Camera2Helper implements ImageReader.OnImageAvailableListener
                     + ", previewHeight:" + mCameraHeight + ", thread:" + Thread.currentThread().getName());
             mYuvDataBufferArray = new byte[PREVIEW_BUFFER_SIZE][mCameraWidth * mCameraHeight * ImageFormat.getBitsPerPixel(ImageFormat.YUV_420_888) / 8];
             mImageReader = ImageReader.newInstance(mCameraWidth, mCameraHeight, ImageFormat.YUV_420_888, PREVIEW_BUFFER_SIZE);
-            mImageReader.setOnImageAvailableListener(this, mainHandler);
+            mImageReader.setOnImageAvailableListener(this, mTaskHandler);
             mCameraManager.openCamera(cameraId, new CameraDevice.StateCallback() {
                 @Override
                 public void onOpened(@NonNull CameraDevice camera) {
@@ -214,7 +214,7 @@ public final class Camera2Helper implements ImageReader.OnImageAvailableListener
                     camera.close();
                     mCameraDevice = null;
                 }
-            }, mainHandler);
+            }, mTaskHandler);
         } catch (Exception e) {
             Log.e(TAG, "openCamera: ", e);
         }
@@ -254,7 +254,7 @@ public final class Camera2Helper implements ImageReader.OnImageAvailableListener
                     CaptureRequest captureRequest = mCaptureRequestBuilder.build();
                     try {
                         // 设置反复捕获数据的请求，这样预览界面就会一直有数据显示
-                        session.setRepeatingRequest(captureRequest, mCaptureCallback, mainHandler);
+                        session.setRepeatingRequest(captureRequest, mCaptureCallback, mTaskHandler);
                     } catch (CameraAccessException e) {
                         Log.e(TAG, "setRepeatingRequest: ", e);
                     }
@@ -265,7 +265,7 @@ public final class Camera2Helper implements ImageReader.OnImageAvailableListener
                     Log.e(TAG, "onConfigureFailed: " + session);
                     mIsPreviewing = false;
                 }
-            }, mainHandler);
+            }, mTaskHandler);
         } catch (Exception e) {
             Log.e(TAG, "startPreview: ", e);
         }

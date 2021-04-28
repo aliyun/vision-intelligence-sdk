@@ -37,7 +37,8 @@ import com.aliyun.ai.viapi.device.DeviceRotation;
 import com.aliyun.ai.viapi.gles.util.OpenGLUtil;
 import com.aliyun.ai.viapi.renderer.IRendererTimeListener;
 import com.aliyun.ai.viapi.renderer.IVIRendererUIStatus;
-import com.aliyun.ai.viapi.renderer.segment.VISegmentRenderer;
+import com.aliyun.ai.viapi.renderer.segment.Camera2Renderer;
+import com.aliyun.ai.viapi.renderer.segment.VideoRenderer;
 import com.aliyun.ai.viapi.renderer.segment.BaseRenderer;
 import com.aliyun.ai.viapi.renderer.segment.Camera1Renderer;
 import com.aliyun.ai.viapi.renderer.IRendererListener;
@@ -48,6 +49,7 @@ import com.aliyun.ai.viapi.ui.model.VBViewModel;
 import com.aliyun.ai.viapi.ui.vb.VBConst;
 import com.aliyun.ai.viapi.ui.widget.GLImageView;
 import com.aliyun.ai.viapi.ui.widget.VBPicturePickView;
+import com.aliyun.ai.viapi.util.Camera2Helper;
 import com.aliyun.ai.viapi.util.CameraHelper;
 import com.aliyun.ai.viapi.util.FileUtil;
 import com.aliyun.ai.viapi.util.Logs;
@@ -76,7 +78,7 @@ public class HumanSegmentFragment extends Fragment implements IRendererListener,
     private OnFragmentCallback mFragmentCallback;
     private BaseRenderer mBaseRenderer;
     private SensorManager mSensorManager;
-    private VISegmentRenderer mVISegmentRenderer;
+    private VideoRenderer mVideoRenderer;
     private TextView mBaseFpsText;
     private LinearLayout mLoadingContainer;
     private TakePictureUtil mTakePictureUtil;
@@ -104,12 +106,11 @@ public class HumanSegmentFragment extends Fragment implements IRendererListener,
         mVBPicturePickView.setItemClickListener(this);
         glSurfaceView.setEGLContextClientVersion(OpenGLUtil.getSupportGLVersion(getContext()));
         // 手机系统大于等于5.0并且手机支持camera2
-//        if (Build.VERSION.SDK_INT >= 21 && Camera2Helper.hasCamera2(getContext())) {
-//            mCameraRenderer = new Camera2Renderer(getActivity(), mGlSurfaceView, this);
-//        } else {
-//            mCameraRenderer = new Camera1Renderer(getActivity(), mGlSurfaceView, this);
-//        }
-        mBaseRenderer = new Camera1Renderer(getActivity(), glSurfaceView, this);
+        if (Build.VERSION.SDK_INT >= 21 && Camera2Helper.hasCamera2(getContext())) {
+            mBaseRenderer = new Camera2Renderer(getActivity(), glSurfaceView, this);
+        } else {
+            mBaseRenderer = new Camera1Renderer(getActivity(), glSurfaceView, this);
+        }
         mBaseRenderer.setMarkFPSListener(this);
         mCameraFace = mBaseRenderer.getCameraFace();
         glSurfaceView.setViewRenderer(mBaseRenderer);
@@ -121,9 +122,9 @@ public class HumanSegmentFragment extends Fragment implements IRendererListener,
         view.findViewById(R.id.icon_select_vb).setOnClickListener(this);
         view.findViewById(R.id.icon_back).setOnClickListener(this);
         mLoadingContainer = view.findViewById(R.id.loading);
-        mVISegmentRenderer = new VISegmentRenderer(getContext(), mBaseRenderer);
-        mVISegmentRenderer.createSelectedVBImageFromConf();
-        mVISegmentRenderer.setIVIRendererUIStatus(this);
+        mVideoRenderer = new VideoRenderer(getContext(), mBaseRenderer);
+        mVideoRenderer.createSelectedVBImageFromConf();
+        mVideoRenderer.setIVIRendererUIStatus(this);
     }
 
     private void setVBPicturePickViewVisibility(int visibility) {
@@ -183,8 +184,8 @@ public class HumanSegmentFragment extends Fragment implements IRendererListener,
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mVISegmentRenderer != null) {
-            mVISegmentRenderer.segmentDestroy();
+        if (mVideoRenderer != null) {
+            mVideoRenderer.segmentDestroy();
         }
         mSensorManager.unregisterListener(this);
     }
@@ -263,7 +264,7 @@ public class HumanSegmentFragment extends Fragment implements IRendererListener,
 
     @Override
     public void onSurfaceCreated() {
-        mVISegmentRenderer.initSegment();
+        mVideoRenderer.initSegment();
     }
 
     @Override
@@ -277,12 +278,12 @@ public class HumanSegmentFragment extends Fragment implements IRendererListener,
         mTextureHeight = textureHeight;
         mYuv420sp = yuv420sp;
         int retTexId;
-        if (null != mVISegmentRenderer.getBlendImageBgBitmap()) {
-            retTexId = mVISegmentRenderer.processSegmentForBuffer(yuv420sp, textureWidth, textureHeight, mCameraFace, getRotationAngle());
+        if (null != mVideoRenderer.getBlendImageBgBitmap()) {
+            retTexId = mVideoRenderer.processSegmentForBuffer(yuv420sp, textureWidth, textureHeight, mCameraFace, getRotationAngle());
             //算法时间
-            mAlgorithmTime = mVISegmentRenderer.getAlgorithmTime();
+            mAlgorithmTime = mVideoRenderer.getAlgorithmTime();
             //加载纹理的时间
-            mLoadTextureTime = mVISegmentRenderer.getLoadTextureTime();
+            mLoadTextureTime = mVideoRenderer.getLoadTextureTime();
         } else {
             retTexId = cameraTexId;
         }
@@ -292,7 +293,7 @@ public class HumanSegmentFragment extends Fragment implements IRendererListener,
 
     @Override
     public void onSurfaceDestroy() {
-        mVISegmentRenderer.releaseGL();
+        mVideoRenderer.releaseGL();
     }
 
     @Override
@@ -301,7 +302,7 @@ public class HumanSegmentFragment extends Fragment implements IRendererListener,
         if (this.mCameraFace != cameraFace) {
             this.mCameraFace = cameraFace;
         }
-        mVISegmentRenderer.reSetVBImage(getRotationAngle(false));
+        mVideoRenderer.reSetVBImage(getRotationAngle(false));
     }
 
     public void takePicOnClick(TakePictureUtil.TakePictureMode mode) {
@@ -314,7 +315,7 @@ public class HumanSegmentFragment extends Fragment implements IRendererListener,
     }
 
     public void takeSegmentPicOnClick(TakePictureUtil.TakePictureMode mode) {
-        mVISegmentRenderer.takeSegmentPic();
+        mVideoRenderer.takeSegmentPic();
     }
 
     private void takePicture(int texId, boolean isOES, float[] mvpMatrix, float[] texMatrix, final int texWidth, final int texHeight) {
@@ -323,7 +324,7 @@ public class HumanSegmentFragment extends Fragment implements IRendererListener,
         }
         mIsNeedTakePicture.set(false);
         if (mTakePictureMode == TakePictureUtil.TakePictureMode.JAVA_BLEND_MODE) {
-            mTakePictureUtil.takePicture(texId, isOES, OpenGLUtil.IDENTITY_MATRIX, texMatrix, texHeight, texWidth, mVISegmentRenderer.getBlendImageBgBitmap());
+            mTakePictureUtil.takePicture(texId, isOES, OpenGLUtil.IDENTITY_MATRIX, texMatrix, texHeight, texWidth, mVideoRenderer.getBlendImageBgBitmap());
         } else if (mTakePictureMode == TakePictureUtil.TakePictureMode.CAMERA_INPUT_SEG_MODE) {
             mTakePictureUtil.captureByCameraOutput(mYuv420sp, mTextureWidth, mTextureHeight, null);
         }
@@ -353,7 +354,7 @@ public class HumanSegmentFragment extends Fragment implements IRendererListener,
 
         if (mVideoAngle != rotationAngle && isReset) {
             mVideoAngle = rotationAngle;
-            mVISegmentRenderer.reSetVBImage(rotationAngle);
+            mVideoRenderer.reSetVBImage(rotationAngle);
         }
         return rotationAngle;
     }
@@ -385,7 +386,6 @@ public class HumanSegmentFragment extends Fragment implements IRendererListener,
 
     @SuppressLint("CheckResult")
     void deleteUserCardPicture(final VBUserCustomCardModel item) {
-
         Single.fromCallable(() -> {
             if (!TextUtils.isEmpty(item.bgImagePath)) {
                 File imagePath = new File(item.bgImagePath);
@@ -403,7 +403,6 @@ public class HumanSegmentFragment extends Fragment implements IRendererListener,
                                         Toast.LENGTH_SHORT).show(),
                         err -> Logs.e(TAG, "delete BgImageName e : " + err.toString()));
     }
-
 
     @SuppressLint("CheckResult")
     private void saveUserSelectPicture(final String imagePath) {
@@ -442,7 +441,7 @@ public class HumanSegmentFragment extends Fragment implements IRendererListener,
                             mVBPicturePickView.addUserCard(mViewModel.createDivideLineCardItem(), false);
                         }
                         mVBPicturePickView.addUserCard(userCardItem);
-                        mVISegmentRenderer.setSelectedVB(userCardItem, getRotationAngle(false));
+                        mVideoRenderer.setSelectedVB(userCardItem, getRotationAngle(false));
                     }
                 }, err -> Logs.e(TAG, "add BgImageName e : " + err.toString()));
     }
@@ -495,7 +494,7 @@ public class HumanSegmentFragment extends Fragment implements IRendererListener,
                 || item.getType() == VBCardType.INNER_PIC
                 || item.getType() == VBCardType.USER_CUSTOM_PIC) {
             mVBPicturePickView.updateSelectedBg(item.getBgImageName());
-            mVISegmentRenderer.setSelectedVB(item, getRotationAngle(false));
+            mVideoRenderer.setSelectedVB(item, getRotationAngle(false));
         } else if (item.getType() == VBCardType.ADD_MENU) {
             if (!isMaxAddLimit()) {
                 openAlbumPicker();
@@ -549,7 +548,7 @@ public class HumanSegmentFragment extends Fragment implements IRendererListener,
                 break;
 
             case R.id.take_seg_out_pic:
-                mVISegmentRenderer.takeSegmentPic();
+                mVideoRenderer.takeSegmentPic();
                 break;
         }
     }

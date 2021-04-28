@@ -1,16 +1,23 @@
 package com.aliyun.ai.viapi;
 
 import android.app.Application;
+import android.content.Context;
 import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.aliyun.ai.viapi.core.VIAPICreateApi;
 import com.aliyun.ai.viapi.core.VIAPIStatusCode;
+import com.aliyun.ai.viapi.util.AssetsProvider;
+import com.aliyun.ai.viapi.util.AssetsUtils;
 import com.aliyun.ai.viapi.util.Logs;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * @author: created by hanbing
@@ -33,6 +40,7 @@ public class VIAPISdkApp extends Application {
     }
 
     private void initSDK() {
+        initModeData(this);
         int status = VIAPICreateApi.getInstance().getVIAPISdkCore().init(this, BuildConfig.DEBUG);
         if (status != 0) {
             Toast.makeText(this, VIAPIStatusCode.getErrorMsg(status), Toast.LENGTH_LONG).show();
@@ -44,6 +52,21 @@ public class VIAPISdkApp extends Application {
                 updateLicense();
             }
         }
+    }
+
+    public static void initModeData(Context context) {
+        String childPath = AssetsProvider.getResourceRootPath();
+        String rootPath = AssetsProvider.getModelsAbsolutePath();
+        Single.fromCallable(() -> {
+            try {
+                AssetsUtils.copyAssetsFile(context.getAssets(), childPath, rootPath);
+                Logs.i(TAG, "模型文件拷贝成功");
+            } catch (IOException e) {
+                Logs.e(TAG, "模型文件拷贝失败：" + e.toString());
+                e.printStackTrace();
+            }
+            return 0;
+        }).subscribeOn(Schedulers.io()).subscribe();
     }
 
     private int licenseExpireDays(String sdkExpireTime) {

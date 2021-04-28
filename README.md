@@ -2,33 +2,34 @@
 viapi-android-sdk-demo 是阿里达摩院推出的一款适用于 Android 平台的实时视频 SDK，提供了包括人像抠图、美颜、人像关键点检测等多种功能。
 
 # 2 功能列表
-+ 相机实时人像分割
-+ 单张图片人像分割
++ 视频流实时人像分割
++ 本地图片人像分割
 + ~~美颜功能（瘦脸、大眼、美白、磨皮等）~~
 + ~~人脸关键点检测~~
 
 # 3 SDK开发包适配及包含内容说明
 ## 3.1 支持的系统和硬件版本
-+ 硬件要求：要求设备上有相机模块,陀螺仪模块。
-+ CPU架构：armeabi-v7a。
-+ 系统：最低支持 Android 4.0（API Level 14），需要开发者通过minSdkVersion来保证支持系统的检测。
++ 硬件要求：要求设备上有相机模块,陀螺仪模块
++ CPU架构：armeabi-v7a
++ 系统：最低支持 Android 4.0（API Level 14）需要开发者通过minSdkVersion来保证支持系统的检测
 
 ## 3.2 开发包资源说明
-+ ovp-sdk-1.0.1.5.aar --viapi的sdk的aar包
-+ damo-viapi.license  --license文件
-+ seg_human_0.0.1.nn  --人像分割模型文件
++ ovp-sdk-x.x.x.x.aar     ——viapi的sdk的aar包，具体版本以获取到的最终版本为准
++ damo-viapi.license      ——sdk全局license文件，对所有能力生效，名字固定不允许修改
++ damo-viapi-xxx.license  ——sdk单个能力license文件，只对单个能力生效，名字路径可以自定义
++ xxx.nn                  ——以.nn为结尾的是SDK使用到的模型文件
 
 # 4 SDK集成步骤
 ## 4.1 将算法能力相关的文件包导入到工程
-把sdk的aar拷贝到主工程libs目录下，把模型文件xxx.nn文件和.license文件拷贝到工程app module的assets目录下如下图：
+把sdk的aar拷贝到主工程libs目录下，把模型文件xxx.nn文件和damo-viapi.license拷贝到工程app module的assets目录下。如下图：
 
-![image](https://github.com/aliyun/vision-intelligence-sdk/blob/master/docs/images/4.1_img.png)
+<img src="https://viapi-test.oss-cn-shanghai.aliyuncs.com/hanbing/viapi-sdk-android-4.1.png" width = "447" height = "466" />
 
-**注意：不要修改license文件名称及存放的路径。**
+**注意：不要修改全局的license文件名称及存放的路径，否则内部拷贝失败。**
 ## 4.2 工程gradle配置
 在主工程的build.gradle文件相关配置设置，主工程的build.gradle文件在Project目录中位置如下图：
 
-![image](https://github.com/aliyun/vision-intelligence-sdk/blob/master/docs/images/4.2_img.png)
+<img src="https://viapi-test.oss-cn-shanghai.aliyuncs.com/hanbing/viapi-sdk-android-4.2.png" width = "556" height = "320" />
 
 ```
 android {
@@ -68,12 +69,20 @@ int类型，返回0为初始化成功，其它返回为初始化失败，具体�
 ```
 ## 5.2 人像分割API使用
 ### 5.2.1 创建算法实例
-#### 接口描述：
-在需要用到图像分割算法的地方，声明算法对象，创建算法实例HumanSegment，HumanSegment对象，HumanSegment是人像分割API接口对象，通过此对象可以完成对图像分割能力的使用。
+#### 实时视频分割接口描述：
+HumanSegment：在需要用到视频实时分割算法的地方，创建HumanSegment分割实例，HumanSegment是视频实时人像分割API接口对象，通过此对象可以完成camera实时视频流分割能力的使用。
 
 #### 算法实例化接口：
 ```
 HumanSegment mHumanSegment = new HumanSegment();
+```
+
+#### 本地图片分割接口描述：
+HumanPhotoSegment：在需要用到本地图片分割算法的地方，创建HumanPhotoSegment分割实例，HumanPhotoSegment是本地图片人像分割API接口对象，通过此对象可以完成图片分割能力的使用。
+
+#### 算法实例化接口：
+```
+HumanPhotoSegment mHumanPhotoSegment = new HumanPhotoSegment();
 ```
 
 #### 参数说明：
@@ -83,41 +92,36 @@ HumanSegment mHumanSegment = new HumanSegment();
 #### 具体代码示例如下：
 ```
 private final HumanSegment mHumanSegment;
+private final HumanPhotoSegment mHumanPhotoSegment;
 mHumanSegment = new HumanSegment();
+mHumanSegment = new HumanPhotoSegment();
 ```
-### 5.2.3 获取.license的路径
+
+### 5.2.2 单个能力license鉴权
 #### 接口描述：
-获取鉴权文件的路径非常重要，路径获取有问题，后续的证书验签会失败，导致算法调用失败，具体实现可参考Demo。
-#### 获取证书路径：
+license证书验签接口，验签通过后才能成功调用算法。
+
+#### license证书验签接口：
+```
+mHumanSegment.nativeCheckLicense(String licensePath);
+
+```
+#### 获取证书路径：针对所有能力生效
 ```
 VIAPICreateApi.getInstance().getVIAPISdkCore().getLicensePath();
 ```
 #### 参数说明：
-无
-#### 返回值：
-无
-#### 具体代码示例如下：
-```
-String licensePath = VIAPICreateApi.getInstance().getVIAPISdkCore().getLicensePath();
-```
-### 5.2.4 license鉴权
-#### 接口描述：
-license证书验签接口，验签通过后才能成功调用算法。
-#### license证书验签接口：
-```
-mHumanSegment.nativeCheckLicense(String licensePath);
-```
-#### 参数说明：
-String licensePath  5.2.3 中获取的.license路径。
+String licensePath  传入全局证书license路径或自定义的单个能力license路径。
+
+注：如果所有能力使用同一个全局证书默认传入全局证书路径即可，如果接入方有针对此能力的单独证书，则需要传入单独的证书文件的绝对路径
 
 #### 返回值：
 int类型，返回0为验签成功，其它返回为验签失败。
 #### 具体代码示例如下：
 ```
-
 int errorCode = mHumanSegment.nativeCheckLicense(licensePath);
 ```
-### 5.2.5 创建算法实例
+### 5.2.3 创建算法实例
 #### 接口描述：
 创建算法内部用于图像分割的实例对象，为图像分割做准备。
 #### 接口示例：
@@ -130,7 +134,7 @@ int类型，返回0为创建算法实例成功，其它返回为创建算法实�
 ```
 int errorCode = = mHumanSegment.nativeSegmentCreate();
 ```
-### 5.2.6 算法init初始化
+### 5.2.4 算法init初始化
 #### 接口描述：
 初始化实例之后的算法对象
 #### 接口示例：
@@ -143,10 +147,11 @@ int类型，返回0为算法初始化成功，其它返回为算法初始化失�
 ```
 int errorCode = mHumanSegment.nativeSegmentInit(modelsPath);
 ```
-**注意：5.2.4、5.2.5、5.2.6步为算法初始化，init方法比较耗时，建议在后台线程执中行操作。**
-### 5.2.7 相机流图像分割算法处理
+**注意：5.2.3、5.2.4步为算法初始化，init方法比较耗时，建议在后台线程执中行操作。**
+### 5.2.5 分割处理
+#### 5.2.5.1 视频流实时分割算法处理
 #### 接口描述：
-该方法为处理图像分割的接口，传入camera的原始nv21数据，获得图像分割后的图像buffer输出数据。适用于相机预览、视频播放处理。
+该方法为处理实时视频分割的接口，传入camera的原始nv21数据，获得分割后的视频图像rgba格式的buffer输出数据，适用于相机预览、视频播放处理。
 #### 接口示例：
 ```
 HumanSegment.nativeSegmentProcessBuffer(byte[] yuv420sp,int textureWidth,int textureHeight,int angle,int cameraFace,int step,ByteBuffer mDstBuffer);
@@ -158,7 +163,7 @@ HumanSegment.nativeSegmentProcessBuffer(byte[] yuv420sp,int textureWidth,int tex
 + angle：图像旋转的角度。可通过Sensor对设备旋转角度判断获得，计算方法详见demo。
 + cameraFace：相机的前后摄像头 前置为1 后置为0。
 + step：算法的步数，算法规定，算法处理帧第一帧传0，其他帧传1。
-+ mDstBuffer：算法处理后的输出数据。
++ mDstBuffer：算法处理后的RGBA格式的输出数据。
 
 #### 返回值:
 int类型，返回0为图像分割算法处理成功，其它返回为图像分割算法处理失败。
@@ -195,18 +200,17 @@ int类型，返回0为图像分割算法处理成功，其它返回为图像分�
 ```
 mDstBuffer = ByteBuffer.allocateDirect(textureWidth * textureHeight * 4);
 ```
-### 5.2.8 单张图片的分割
+#### 5.2.5.2 本地图片的分割
 #### 接口描述:
-该接口可以进行单张图片的分割，适用于手机拍照、手机相册选择图片等场景。
+HumanPhotoSegment对象的该接口可以对本地单张图片进行分割，适用于证件照等本地抠图场景。
 #### 接口示例：
 ```
-public native int nativeSegmentProcessPicture(byte[] data,int format, int width, int height, int channel, byte[] out);
+public native int nativeSegmentProcess(byte[] img, int width, int height, int channel, byte[] out);
 ```
 #### 参数说明：
-+ data：待处理的图片数据。
-+ format：待处理的图片数据格式：保留字段，目前传入无意义，目前支持RGBA。
-+ width：data图像数据的宽。
-+ height：data 图像数据的高。
++ img：待处理图片的数据，目前仅支持rgba。
++ width：图像数据的宽。
++ height：图像数据的高。
 + channel： 数据通道数，目前只需要传4即可。
 + out：    算法处理后返回的图片buffer数据。
 
@@ -214,14 +218,17 @@ public native int nativeSegmentProcessPicture(byte[] data,int format, int width,
 int类型，返回0为图像分割算法处理成功，其它返回为图像分割算法处理失败。
 #### 具体代码示例如下：
 ```
-mHumanSegment.nativeSegmentProcessPicture(data,1,width,height,channel,out);
+ByteBuffer originalBuffer = ByteBuffer.allocateDirect(bitmap.getWidth() * bitmap.getHeight() * 4);
+ByteBuffer dstBuffer = ByteBuffer.allocateDirect(bitmap.getWidth() * bitmap.getHeight() * 4);
+bitmap.copyPixelsToBuffer(originalBuffer);
+int status = mHumanSegment.nativeSegmentProcess(originalBuffer.array(), bitmap.getWidth(), bitmap.getHeight(), 4, dstBuffer.array());
 ```
 **注意：算法内部没有对内存进行处理，输出buffer需提前申请内存空间，初始化格式为：**
 ```
 ByteBuffer dstBuffer = ByteBuffer.allocateDirect(bitmap.getWidth() * bitmap.getHeight() * 4);
 ```
 
-### 5.2.9 算法Clear操作
+### 5.2.6 算法Clear操作
 #### 接口描述：
 与init成对使用，反init操作，在不需要用到算法的时候，进行算法资源的删除。
 #### 接口示例：
@@ -238,7 +245,7 @@ int类型，返回0为删除算法相关成功，其它返回为删除算法相�
 ```
 **注意：nativeSegmentClear调用之后，再次使用必须重新调用5.2.6 nativeSegmentInit 进行算法初始化**
 
-### 5.2.10 算法销毁Destroy
+### 5.2.7 算法销毁Destroy
 #### 接口描述：
 在不需要用到算法的时候，对算法对象的销毁内存释放操作。
 #### 接口示例：
@@ -253,19 +260,18 @@ int类型，返回0为销毁算法相关成功，其它返回为销毁算法相�
 ```
   mHumanSegment.nativeSegmentDestroy();
 ```
-**注意：5.2.9、5.2.10需在不需mHumanSegment对象的时候先clear再destroy**
-### 5.2.11 各方法调用顺序说明
-1. 先在Application设置 5.2.1 SDK初始化化：VIAPICreateApi.getInstance().getVIAPISdkCore().init(Context context);
-2. 创建算法实例 5.2.2 ：HumanSegment mHumanSegment = new HumanSegment();
-3. license验签 5.2.4 ：mHumanSegment.nativeCheckLicense(String licensePath);
-4. 创建算法对象实例 5.2.5 ：HumanSegment.nativeSegmentCreate();
-5. 算法init初始化操作 5.2.6 ：HumanSegment.nativeSegmentInit(String modelsPath);
-6. 相机流图像分割算法处理 5.2.7 ：HumanSegment.nativeSegmentProcessBuffer(byte[] yuv420sp,int textureWidth,int textureHeight,int angle,int cameraFace,int step,ByteBuffer mDstBuffer);
-7. 单张图片的分割 5.2.8：public native int nativeSegmentProcessPicture(byte[] data,int format, int width, int height, int channel, byte[] out);
-8. 算法clear操作 5.2.9 ：HumanSegment.nativeSegmentClear();
-9. 销毁算法对象 5.2.10 ：HumanSegment.nativeSegmentDestroy();
+**注意：5.2.6、5.2.7 释放资源时要先clear再destroy**
+### 5.2.8 各方法调用顺序说明
+1. 先在Application中对 SDK初始化化：VIAPICreateApi.getInstance().getVIAPISdkCore().init(Context context);
+2. 创建算法实例 5.2.1 ：HumanSegment mHumanSegment = new HumanSegment();
+3. license验签 5.2.2 ：mHumanSegment.nativeCheckLicense(String licensePath);
+4. 创建算法对象实例 5.2.3 ：HumanSegment.nativeSegmentCreate();
+5. 算法init初始化操作 5.2.4 ：HumanSegment.nativeSegmentInit(String modelsPath);
+6. 实时视频流分割算法处理 5.2.5 ：HumanSegment.nativeSegmentProcessBuffer(byte[] yuv420sp,int textureWidth,int textureHeight,int angle,int cameraFace,int step,ByteBuffer mDstBuffer);
+7. 算法clear操作 5.2.6 ：HumanSegment.nativeSegmentClear();
+8. 销毁算法对象 5.2.7 ：HumanSegment.nativeSegmentDestroy();
 
-**注意：6、7为视频抠图和单张图片抠图，不分前后顺序，可根据具体场景调用**
+**注意：5.2.5为视频抠图和单张图片抠图两个方法，根据创建的对象选择调用即可**
 
 ## 5.3 美颜API使用
 
@@ -285,10 +291,16 @@ int类型，返回0为销毁算法相关成功，其它返回为销毁算法相�
 + 运行demo时，需将正式的license替换到assets目录，且applicationID(包名)和license对应。
 + sdk的license包含了多个算法能力，如用户申请的license不包含其中的某算法能力，调用对应的算法API对应的接口时返回错误，错误说明详见<6.1 错误码含义>。
 
-# 8 license过期时间获取
+# 8 license鉴权接口
+## 8.1 全局license鉴权
 #### 接口描述：
-获取当前SDK中license的过期时间，业务层通过此时间，可以实现用续费后的license替换掉此过期的license文件以达到续费SDK效果
-#### 接口示例：
+目前仅提供获取license过期时间方法调用与获取全局license路径获取
+
+#### 获取证书路径
+```
+VIAPICreateApi.getInstance().getVIAPISdkCore().getLicensePath();
+```
+#### 获取过期时间：获取当前SDK中全局license的过期时间，业务层通过此时间可以实现续费，用新的license文件替换掉此过期的license文件实现续费
 ```
   String sdkExpireTime = VIAPICreateApi.getInstance().getVIAPISdkCore().getLicenseExpireTime();
 ```
@@ -333,6 +345,18 @@ license过期时间
     private void replaceLicense(String dstLicensePath, String newLicenseFile) {
         // 用新的license替换旧的license文件
     }
+```
+## 8.2 单能力license鉴权
+#### 接口描述：非全局license只对本算法生效，需要单独通过算法对象初始化，如果使用全局license，单个能力不用调用nativeCheckLicense进行license鉴权。
+### 8.2.1 非全局license初始化方法
+```
+ int nativeCheckLicense(String licensePath);
+ // licensePath 为license文件绝对路径
+ mHumanSegment.nativeCheckLicense(licensePath);
+```
+### 8.2.2 非全局license获取时间获取
+```
+  String licenseExpireTime = mHumanSegment.nativeGetLicenseExpireTime();
 ```
 
 # 9 注意事项

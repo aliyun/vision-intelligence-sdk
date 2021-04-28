@@ -23,7 +23,6 @@ import java.io.FileNotFoundException;
 public class VBConfRecord extends PreferenceUtils {
     private final static String TAG = "VBConfRecord";
     private final static String HUMAN_SEGMENT_VB_IMAGE_NAME = "human_segment_vb_image_name";
-    private final static String VIAPI_SEGMENT_MODE_VERSION_KEY = "viapi_segment_mode_version_key";
 
     public static void saveUserSelectVbImage(Context context, String virtualBgName) {
         if (virtualBgName == null) {
@@ -68,13 +67,4 @@ public class VBConfRecord extends PreferenceUtils {
         }
         return (imageName.startsWith("/"));
     }
-
-    public static int getVIAPISegmentModeVersion(Context context) {
-        return (int) get(context, VIAPI_SEGMENT_MODE_VERSION_KEY, 0);
-    }
-
-    public static void setVIAPISegmentModeVersion(Context context, int version) {
-        put(context, VIAPI_SEGMENT_MODE_VERSION_KEY, version);
-    }
-
 }

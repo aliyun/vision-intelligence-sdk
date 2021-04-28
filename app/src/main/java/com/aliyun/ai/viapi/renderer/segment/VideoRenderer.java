@@ -32,8 +32,8 @@ import io.reactivex.schedulers.Schedulers;
  * @date: 2020/11/29
  * @Description:
  */
-public class VISegmentRenderer {
-    public final static String TAG = VISegmentRenderer.class.getSimpleName();
+public class VideoRenderer {
+    public final static String TAG = VideoRenderer.class.getSimpleName();
     private final Context mContext;
     private final AtomicBoolean mInitSegment = new AtomicBoolean(false);
     private final AtomicBoolean mIsNeedTakePicture = new AtomicBoolean(false);
@@ -53,7 +53,7 @@ public class VISegmentRenderer {
     private Bitmap blendImageBg;
     private String mVBName;
 
-    public VISegmentRenderer(Context context, BaseRenderer renderer) {
+    public VideoRenderer(Context context, BaseRenderer renderer) {
         mCameraRenderer = renderer;
         mContext = context;
         mHumanSegment = new HumanSegment();
@@ -81,12 +81,12 @@ public class VISegmentRenderer {
                 mIVIRendererUIStatus.showLoading();
             }
         });
-        if (!AssetsProvider.copySegmentModeFile(mContext)) {
-            Logs.e(TAG, "copySegmentModeFile fail ");
-            return;
-        }
+//        if (!AssetsProvider.copySegmentModeFile(mContext)) {
+//            Logs.e(TAG, "copySegmentModeFile fail ");
+//            return;
+//        }
         final Integer[] status = new Integer[1];
-        String modelsPath = AssetsProvider.getSegmentModelsFilePath(mContext);
+        String modelsPath = AssetsProvider.getVideoSegmentModelsPath(mContext);
         String licensePath = VIAPICreateApi.getInstance().getVIAPISdkCore().getLicenseFilePath();
         synchronized (mInitLock) {
             status[0] = mHumanSegment.nativeCheckLicense(licensePath);
@@ -96,6 +96,8 @@ public class VISegmentRenderer {
                         "checkingAuth failed status = " + status[0], Toast.LENGTH_LONG).show());
                 return;
             }
+            String expireTime = mHumanSegment.nativeGetLicenseExpireTime();
+            Logs.i(TAG, "VIRenderer -> segment license expireTime =  " + expireTime);
             status[0] = mHumanSegment.nativeSegmentCreate();
             if (status[0] != 0) {
                 Logs.e(TAG, "VIRenderer -> segment createHandle error =  " + status[0]);
@@ -115,7 +117,6 @@ public class VISegmentRenderer {
             });
         } else {
             mInitSegment.set(false);
-            VBConfRecord.setVIAPISegmentModeVersion(mContext, 0);
             Logs.e(TAG, "VIRenderer -> segment initProcess error = " + status[0]);
             ThreadExecutor.runOnMainThread(() -> Toast.makeText(VIAPISdkApp.getContext(),
                     "segment initProcess failed status = " + status[0], Toast.LENGTH_LONG).show());

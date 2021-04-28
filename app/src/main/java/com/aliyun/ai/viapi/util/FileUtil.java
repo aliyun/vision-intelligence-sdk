@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 
@@ -87,5 +88,32 @@ public class FileUtil {
             }
         }
         return isSuccess;
+    }
+
+
+    public static void copyToFile(InputStream inputStream, File destFile) throws IOException {
+        if (destFile.exists()) {
+            return;
+
+        }
+        File file = destFile.getParentFile();
+        if (file != null && !file.exists()) {
+            file.mkdirs();
+        }
+        FileOutputStream out = new FileOutputStream(destFile);
+        try {
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) >= 0) {
+                out.write(buffer, 0, bytesRead);
+            }
+        } finally {
+            out.flush();
+            try {
+                out.getFD().sync();
+            } catch (IOException e) {
+            }
+            out.close();
+        }
     }
 }

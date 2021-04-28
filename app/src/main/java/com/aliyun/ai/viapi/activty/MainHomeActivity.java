@@ -1,16 +1,21 @@
 package com.aliyun.ai.viapi.activty;
 
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.aliyun.ai.viapi.R;
 import com.aliyun.ai.viapi.VIAPISdkApp;
 import com.aliyun.ai.viapi.ui.fragment.HomeFragment;
 import com.aliyun.ai.viapi.ui.fragment.HumanSegmentFragment;
+import com.aliyun.ai.viapi.ui.fragment.ImageSegmentFragment;
 import com.aliyun.ai.viapi.ui.fragment.OnFragmentCallback;
 import com.aliyun.ai.viapi.ui.homepage.HomeTabPageId;
 
@@ -38,6 +43,8 @@ public class MainHomeActivity extends AppCompatActivity implements OnFragmentCal
                 switchFragment(HumanSegmentFragment.newInstance("", ""), true);
                 break;
             case PICTRRE_SEGMENT_PAGE:
+                switchFragment(ImageSegmentFragment.newInstance("", ""), true);
+                break;
             case FACEBEAUTY_PAGE:
             case FACE_LANDMASK_PAGE:
             case HUMAN_BODY_LANDMASK_PAGE:
@@ -67,6 +74,18 @@ public class MainHomeActivity extends AppCompatActivity implements OnFragmentCal
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        FragmentManager manager = getSupportFragmentManager();
+        for (int i = 0; i < manager.getFragments().size(); i++) {
+            Fragment fragment = manager.getFragments().get(i);
+            if (fragment != null && fragment instanceof ImageSegmentFragment) {
+                fragment.onActivityResult(requestCode, resultCode, data);
+            }
+        }
+    }
 
     @Override
     public void onBackPressed() {
