@@ -24,10 +24,13 @@ import androidx.fragment.app.Fragment;
 
 import com.aliyun.ai.viapi.HumanPhotoSegment;
 import com.aliyun.ai.viapi.R;
+import com.aliyun.ai.viapi.core.VIAPIStatusCode;
+import com.aliyun.ai.viapi.gles.util.BitmapUtils;
 import com.aliyun.ai.viapi.gles.util.OpenGLUtil;
 import com.aliyun.ai.viapi.gles.util.ToastUtil;
 import com.aliyun.ai.viapi.renderer.segment.ImageRenderer;
 import com.aliyun.ai.viapi.util.AssetsProvider;
+import com.aliyun.ai.viapi.util.Logs;
 import com.aliyun.ai.viapi.util.PictureUtil;
 
 import java.nio.ByteBuffer;
@@ -88,17 +91,31 @@ public class ImageSegmentFragment extends Fragment implements View.OnClickListen
     /**
      * 此方法比较耗时，需要在后台线程调用
      */
+    @SuppressLint("CheckResult")
     public void initSegment() {
         //实例化算法对象
         mHumanSegment = new HumanPhotoSegment();
         Single.fromCallable(() -> {
             String modelsPath = AssetsProvider.getPhotoSegmentModelsPath(getContext());
-            mHumanSegment.nativeSegmentCreate();
-            mHumanSegment.nativeSegmentInit(modelsPath);
+            int status = mHumanSegment.nativeSegmentCreate();
+            if (status != 0) {
+                return status;
+            }
+            status = mHumanSegment.nativeSegmentInit(modelsPath);
+            if (status != 0) {
+                return status;
+            }
             mInitSegment.set(true);
-            Log.d("初始化完成", "initPhotoSegment: " + mInitSegment);
-            return 0;
-        }).subscribeOn(Schedulers.io()).subscribe();
+            return status;
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(status -> {
+                    Toast.makeText(getContext(), getString(R.string.common_init_fail)
+                                    + ",status = " + VIAPIStatusCode.getErrorMsg(status),
+                            Toast.LENGTH_LONG).show();
+                    Log.i(TAG, "initPhotoSegment status = " + status);
+
+                }, err -> Logs.e(TAG, "ImageSegmentFragment initSegment: " + err.toString()));
     }
 
     @Override
@@ -113,7 +130,7 @@ public class ImageSegmentFragment extends Fragment implements View.OnClickListen
                 if (mFlResult.getChildCount() > 0) {
                     mFlResult.removeAllViews();
                 }
-                aliSegImage(mOriginalBitmap);
+                aliSegImage(compressBitmap(mOriginalBitmap));
                 break;
             default:
                 break;
@@ -137,7 +154,6 @@ public class ImageSegmentFragment extends Fragment implements View.OnClickListen
                 if (resultCode == Activity.RESULT_OK) {
                     //获取选中文件的定位符
                     Uri uri = data.getData();
-                    Log.e("uri", uri.toString());
                     String imagePath = PictureUtil.getPathByUri(getContext(), uri);
                     int degree = PictureUtil.readPictureDegree(imagePath);
                     mOriginalBitmap = BitmapFactory.decodeFile(imagePath);
@@ -150,10 +166,24 @@ public class ImageSegmentFragment extends Fragment implements View.OnClickListen
                     }
                 } else {
                     //操作错误或没有选择图片
-                    Log.i("ImageSelectedResult", "operation error");
+                    Log.e(TAG, "operation error");
                 }
                 break;
         }
+    }
+
+    /**
+     * 对图片进行尺寸压缩
+     */
+    private Bitmap compressBitmap(Bitmap bitmap) {
+        float maxLength = Math.max(bitmap.getWidth(), bitmap.getHeight());
+        float maxTextureSize = OpenGLUtil.getMaxTextureSize();
+        Log.d(TAG, "width is [" + bitmap.getWidth() + "]" + ", height is [" + bitmap.getHeight() + "]");
+        Log.d(TAG, "maxTextureSize: " + maxTextureSize);
+        if (maxLength > maxTextureSize) {
+            return BitmapUtils.compressBitmap(bitmap, maxTextureSize / maxLength);
+        }
+        return bitmap;
     }
 
     /**
@@ -182,9 +212,9 @@ public class ImageSegmentFragment extends Fragment implements View.OnClickListen
             ByteBuffer originalBuffer = ByteBuffer.allocateDirect(bitmap.getWidth() * bitmap.getHeight() * 4);
             ByteBuffer dstBuffer = ByteBuffer.allocateDirect(bitmap.getWidth() * bitmap.getHeight() * 4);
             bitmap.copyPixelsToBuffer(originalBuffer);
-            Log.e("bitmap-static-image", "width is [" + bitmap.getWidth() + "]" + ", height is [" + bitmap.getHeight() + "]");
+            Log.d(TAG, "width is [" + bitmap.getWidth() + "]" + ", height is [" + bitmap.getHeight() + "]");
             int lastProcessResult = mHumanSegment.nativeSegmentProcess(originalBuffer.array(), bitmap.getWidth(), bitmap.getHeight(), 4, dstBuffer.array());
-            Log.e("lastProcessResult的值", lastProcessResult + "");
+            Log.d(TAG, "lastProcessResult的值: " + lastProcessResult);
             return dstBuffer;
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

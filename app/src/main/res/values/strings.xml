@@ -7,6 +7,7 @@
     <string name="common_cancel">取消</string>
     <string name="common_i_know">我知道了</string>
     <string name="common_delete">删除</string>
+    <string name="common_init_fail">初始化失败</string>
 
     <!--homepage-->
     <string name="developing">正在开发中，敬请期待</string>

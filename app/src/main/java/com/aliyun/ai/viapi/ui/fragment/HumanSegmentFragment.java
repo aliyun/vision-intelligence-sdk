@@ -399,7 +399,7 @@ public class HumanSegmentFragment extends Fragment implements IRendererListener,
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(deleteSuccess ->
-                                Toast.makeText(getContext(), R.string.common_delete,
+                                Toast.makeText(getContext(), getString(R.string.common_delete),
                                         Toast.LENGTH_SHORT).show(),
                         err -> Logs.e(TAG, "delete BgImageName e : " + err.toString()));
     }

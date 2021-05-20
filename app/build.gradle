@@ -37,12 +37,26 @@ android {
         }
     }
 
+    signingConfigs {
+        release {
+            try {
+                storeFile = file(System.getenv('sdk_keystore'))
+                keyAlias = System.getenv('sdk_keyalias')
+                storePassword = System.getenv('sdk_keystore_password')
+                keyPassword = System.getenv('sdk_keystore_password')
+                storeType = "jks"
+            } catch (exp) {
+            }
+        }
+    }
+
     buildTypes {
         release {
             debuggable false
             zipAlignEnabled true
             minifyEnabled true
             shrinkResources true
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -72,9 +86,7 @@ android {
 def renameApk(getBuildTime) {
     android.applicationVariants.all { variant ->
         variant.outputs.all {
-            def apkFileName = rootProject.name.toLowerCase() +
-//                    "_" + getVersionName().replace(".", "_") +
-                    "_" + getBuildTime() +
+            def apkFileName = "viapi-sdk-" +
                     "_${variant.buildType.name}" +
                     ".apk"
             outputFileName = apkFileName

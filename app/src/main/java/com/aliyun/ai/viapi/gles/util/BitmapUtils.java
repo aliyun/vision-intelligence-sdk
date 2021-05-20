@@ -408,6 +408,20 @@ public class BitmapUtils {
         return newbmp;
     }
 
+    /**
+     * 图片尺寸等比例缩放
+     */
+    public static Bitmap compressBitmap(Bitmap bitmap, float scale) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        //获取想要缩放的matrix
+        Matrix matrix = new Matrix();
+        matrix.postScale(scale, scale);
+        //获取新的bitmap
+        bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+        return bitmap;
+    }
+
     public interface OnCaptureBitmapListener {
         /**
          * 读取图片完成
